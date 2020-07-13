@@ -1,0 +1,3 @@
+Thank you for installing SpaceONE Helm Chart.
+
+# How to initiate

@@ -1,0 +1,42 @@
+{{ if eq .Release.Revision 1 }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init-db
+        image: {{ .Values.mongo.image }}
+#        command: ["/bin/bash", "-c", "/bin/sleep {{ default 10 .Values.sleepyTime }} && echo hello world"]
+        #        - name: init-data-temp
+        #          image: mongo
+        #          rest
+        command:
+          - sh
+          - -c
+          - sleep 10s && mongo --host {{ .Values.mongo.host }}:{{ .Values.mongo.port }} --username {{ .Values.mongo.username }} --password {{ .Values.mongo.password }} < /app/scripts/init-db.js
+        volumeMounts:
+          - mountPath: /app/scripts/init-db.js
+            name: mongo-conf
+            subPath: init-db.js
+      volumes:
+        - name: mongo-conf
+          configMap:
+            name: mongo-conf
+{{ end }}

@@ -1,0 +1,24 @@
+{{ if .Values.consul.enabled }}
+# deploying gitlab pod by Service and Pod
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: consul
+  name: consul
+  namespace: default
+spec:
+  type: ClusterIP # connect ClusterIP to Nginx Ingress Controller
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8500
+      protocol: TCP
+
+    - name: httpd
+      port: 8500
+      targetPort: 8500
+      protocol: TCP
+  selector:
+    app: consul
+{{ end }}

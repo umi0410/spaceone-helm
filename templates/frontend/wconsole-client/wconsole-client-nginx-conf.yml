@@ -1,0 +1,46 @@
+{{ if .Values.frontend.enabled }}
+{{ if .Values.frontend.console.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wconsole-client-nginx
+  namespace: {{ .Values.namespace }}
+data:
+  wconsole-client.conf: |
+    server {
+        listen 80;
+        # server_name *.console.dev.spaceone.dev;
+
+        root /var/www/;
+        index index.html;
+
+        access_log /logs/wconsole-client-access.log;
+        error_log  /logs/wconsole-client-error.log;
+
+        location / {
+            try_files $uri /index.html;
+        }
+
+        location /check {
+            if_modified_since off;
+            try_files $uri /check.html;
+        }
+
+        location /favicon.ico {
+            expires 1d;
+            add_header Cache-Control "public, no-transform";
+        }
+    }
+
+    server {
+        listen 80;
+
+        root /var/www/;
+
+        location /check {
+            if_modified_since off;
+            try_files $uri /check.html;
+        }
+    }
+{{ end }}
+{{ end }}

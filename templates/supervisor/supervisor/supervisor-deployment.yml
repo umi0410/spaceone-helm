@@ -1,0 +1,52 @@
+{{ if .Values.supervisor.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: supervisor
+  name: supervisor
+  namespace: '{{ .Values.namespace }}'
+spec:
+  replicas: {{ .Values.supervisor.supervisor.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: supervisor
+  template:
+    metadata:
+      annotations:
+#        spaceone.supervisor.date: ${new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(new java.util.Date())}
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/supervisor/supervisor/supervisor-conf.yml") . | sha256sum }}
+      labels:
+        app: supervisor
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      serviceAccountName: supervisor
+      containers:
+        - name: supervisor
+          image: {{ .Values.supervisor.supervisor.image }}
+          imagePullPolicy: {{ .Values.supervisor.imagePullPolicy }}
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - name: supervisor-conf
+              mountPath: /opt/spaceone/supervisor/config/supervisor.yml
+              subPath: supervisor.yml
+              readOnly: true
+            - name: log-volume
+              mountPath: /logs
+          env:
+            - name: SPACEONE_CONFIG_FILE
+              value: /opt/spaceone/supervisor/config/supervisor.yml
+        - name: kubectl-proxy
+          image: {{ .Values.supervisor.kubectlProxy.image }}
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: supervisor-conf
+          configMap:
+            name: supervisor-conf
+        - name: log-volume
+          emptyDir: {}
+
+{{ end }}

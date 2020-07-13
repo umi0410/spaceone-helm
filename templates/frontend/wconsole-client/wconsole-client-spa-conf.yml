@@ -1,0 +1,18 @@
+{{ if .Values.frontend.enabled }}
+{{ if .Values.frontend.console.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wconsole-client-spa-conf
+  namespace: {{ .Values.namespace }}
+data:
+  production.json: |
+    {
+      "VUE_APP_API": {
+        "ENDPOINT": "http://console-server"
+      },
+      "GTAG_ID": "DISABLED",
+      "NO_SERVER_MODE": false
+    }
+{{ end }}
+{{ end }}

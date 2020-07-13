@@ -1,0 +1,54 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.statistics.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: statistics-conf
+  namespace: {{ .Values.namespace }}
+data:
+  statistics.yml: |
+    GLOBAL:
+      DATABASES:
+        default:
+          db: 'dev-statistics'
+          host: {{ .Values.mongo.host }}
+          port: {{ .Values.mongo.port }}
+          username: {{ .Values.mongo.username }}
+          password: {{ .Values.mongo.password }}
+          maxPoolSize: 200
+      CACHES:
+        default:
+          backend: spaceone.core.cache.redis_cache.RedisCache
+          host: {{ .Values.redis.host }}
+          port: {{ .Values.redis.port }}
+          db: 5
+          encoding: utf-8
+          socket_timeout: 10
+          socket_connect_timeout: 10
+      LOG:
+        loggers:
+          spaceone:
+            handlers:
+              - console
+              - file
+        handlers:
+          file:
+            type: file
+            filename: /logs/statistics.log
+      CONNECTORS:
+        ServiceConnector:
+          identity: grpc://{{ .Values.backend.services.identity.endpoint }}/v1
+          inventory: grpc://{{ .Values.backend.services.inventory.endpoint }}/v1
+          plugin: grpc://{{ .Values.backend.services.plugin.endpoint }}/v1
+          repository: grpc://{{ .Values.backend.services.repository.endpoint }}/v1
+          secret: grpc://{{ .Values.backend.services.secret.endpoint }}/v1
+          monitoring: grpc://{{ .Values.backend.services.monitoring.endpoint }}/v1
+      HANDLERS:
+        authentication:
+          - backend: spaceone.core.handler.authentication_handler.AuthenticationGRPCHandler
+            uri: grpc://{{ .Values.backend.services.identity.endpoint }}/v1/Domain/get_public_key
+        authorization:
+          - backend: spaceone.core.handler.authorization_handler.AuthorizationGRPCHandler
+            uri: grpc://{{ .Values.backend.services.identity.endpoint }}/v1/Authorization/verify
+{{ end }}
+{{ end }}

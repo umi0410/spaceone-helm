@@ -1,0 +1,22 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.config.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: config
+
+  name: config
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - nodePort: 30058
+      port: 50051
+      protocol: TCP
+  selector:
+    app: config
+  sessionAffinity: None
+  type: NodePort
+{{ end }}
+{{ end }}

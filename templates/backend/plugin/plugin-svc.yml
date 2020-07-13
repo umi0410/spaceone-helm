@@ -1,0 +1,21 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.plugin.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: plugin
+  name: plugin
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - nodePort: 30052
+      port: 50051
+      protocol: TCP
+  selector:
+    app: plugin
+  sessionAffinity: None
+  type: NodePort
+{{ end }}
+{{ end }}

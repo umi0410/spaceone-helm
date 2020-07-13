@@ -1,0 +1,72 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.identity.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: identity
+  name: identity
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: identity
+  template:
+    metadata:
+      annotations:
+        spaceone.identity.date: temp-spaceone-data-annotation
+#        spaceone.auto-roll-flag: {{ randAlphaNum 6 | quote }}
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/backend/identity/identity-conf.yml") . | sha256sum }}
+      labels:
+        app: identity
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: identity
+          image: {{ .Values.backend.services.identity.image }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - name: identity-conf
+              mountPath: /opt/spaceone/identity/config/identity.yml
+              subPath: identity.yml
+              readOnly: true
+            - name: log-volume
+              mountPath: /logs
+          livenessProbe:
+            exec:
+              command:
+                - /bin/grpc_health_probe
+                - -addr=127.0.0.1:50051
+                - -service=identity
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/grpc_health_probe
+#                - -addr=127.0.0.1:50051
+#                - -service=identity
+#            initialDelaySeconds: 5
+#            failureThreshold: 3
+#            periodSeconds: 5
+#            successThreshold: 2
+#            timeoutSeconds: 1
+          env:
+            - name: SPACEONE_CONFIG_FILE
+              value: /opt/spaceone/identity/config/identity.yml
+      volumes:
+        - name: identity-conf
+          configMap:
+            name: identity-conf
+        - name: log-volume
+          emptyDir: {}
+
+{{ end }}
+{{ end }}

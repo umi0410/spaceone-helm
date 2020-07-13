@@ -1,0 +1,70 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.repository.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: repository
+  name: repository
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: repository
+  template:
+    metadata:
+      annotations:
+        spaceone.repository.date: temp-spaceone-data-annotation
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/backend/repository/repository-conf.yml") . | sha256sum }}
+      labels:
+        app: repository
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: repository
+          image: {{ .Values.backend.services.repository.image }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - name: repository-conf
+              mountPath: /opt/spaceone/repository/config/repository.yml
+              subPath: repository.yml
+              readOnly: true
+            - name: log-volume
+              mountPath: /logs
+          livenessProbe:
+            exec:
+              command:
+                - /bin/grpc_health_probe
+                - -addr=127.0.0.1:50051
+                - -service=repository
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/grpc_health_probe
+#                - -addr=127.0.0.1:50051
+#                - -service=repository
+#            initialDelaySeconds: 5
+#            failureThreshold: 3
+#            periodSeconds: 5
+#            successThreshold: 2
+#            timeoutSeconds: 1
+          env:
+            - name: SPACEONE_CONFIG_FILE
+              value: /opt/spaceone/repository/config/repository.yml
+      volumes:
+        - name: repository-conf
+          configMap:
+            name: repository-conf
+        - name: log-volume
+          emptyDir: {}
+{{ end }}
+{{ end }}

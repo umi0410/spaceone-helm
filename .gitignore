@@ -1,0 +1,5 @@
+.idea
+*/.idea
+charts/
+dev-values.yaml
+spaceone-*.tgz

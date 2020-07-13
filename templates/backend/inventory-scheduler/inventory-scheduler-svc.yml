@@ -1,0 +1,21 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.inventoryScheduler.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: inventory-scheduler
+  name: inventory-scheduler
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - nodePort: 30060
+      port: 50051
+      protocol: TCP
+  selector:
+    app: inventory-scheduler
+  sessionAffinity: None
+  type: NodePort
+{{ end }}
+{{ end }}

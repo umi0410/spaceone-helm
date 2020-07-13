@@ -1,0 +1,21 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.identity.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: identity
+  name: identity
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - nodePort: 30051
+      port: 50051
+      protocol: TCP
+  selector:
+    app: identity
+  sessionAffinity: None
+  type: NodePort
+{{ end }}
+{{ end }}

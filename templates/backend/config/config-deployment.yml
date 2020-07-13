@@ -1,0 +1,70 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.config.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: config
+  name: config
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: config
+  template:
+    metadata:
+      annotations:
+        spaceone.config.date: temp-spaceone-data-annotation
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/backend/identity/identity-conf.yml") . | sha256sum }}
+      labels:
+        app: config
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: config
+          image: {{ .Values.backend.services.config.image }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - name: config-conf
+              mountPath: /opt/spaceone/config/config/config.yml
+              subPath: config.yml
+              readOnly: true
+            - name: log-volume
+              mountPath: /logs
+          livenessProbe:
+            exec:
+              command:
+                - /bin/grpc_health_probe
+                - -addr=127.0.0.1:50051
+                - -service=config
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/grpc_health_probe
+#                - -addr=127.0.0.1:50051
+#                - -service=config
+#            initialDelaySeconds: 5
+#            failureThreshold: 3
+#            periodSeconds: 5
+#            successThreshold: 2
+#            timeoutSeconds: 1
+          env:
+            - name: SPACEONE_CONFIG_FILE
+              value: /opt/spaceone/config/config/config.yml
+      volumes:
+        - name: config-conf
+          configMap:
+            name: config-conf
+        - name: log-volume
+          emptyDir: {}
+{{ end }}
+{{ end }}

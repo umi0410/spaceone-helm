@@ -1,0 +1,72 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.inventory.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: inventory
+  name: inventory
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      annotations:
+        spaceone.inventory.date: temp-spaceone-data-annotation
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/backend/inventory/inventory-conf.yml") . | sha256sum }}
+      labels:
+        app: inventory
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: inventory
+          image: {{ .Values.backend.services.inventory.image }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - name: inventory-conf
+              mountPath: /opt/spaceone/inventory/config/inventory.yml
+              subPath: inventory.yml
+              readOnly: true
+            - name: log-volume
+              mountPath: /logs
+          livenessProbe:
+            exec:
+              command:
+                - /bin/grpc_health_probe
+                - -addr=127.0.0.1:50051
+                - -service=inventory
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/grpc_health_probe
+#                - -addr=127.0.0.1:50051
+#                - -service=inventory
+#            initialDelaySeconds: 5
+#            failureThreshold: 3
+#            periodSeconds: 5
+#            successThreshold: 2
+#            timeoutSeconds: 1
+          env:
+            - name: SPACEONE_CONFIG_FILE
+              value: /opt/spaceone/inventory/config/inventory.yml
+
+
+      volumes:
+        - name: inventory-conf
+          configMap:
+            name: inventory-conf
+        - name: log-volume
+          emptyDir: {}
+{{ end }}
+{{ end }}

@@ -1,0 +1,56 @@
+{{ if .Values.frontend.enabled }}
+{{ if .Values.frontend.console.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: console-client
+    environment: development
+  name: console-client
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.frontend.console.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: console-client
+  template:
+    metadata:
+      annotations:
+        spaceone.consoleclient.date: temp-spaceone-data-annotation
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/frontend/wconsole-client/wconsole-client-spa-conf.yml") . | sha256sum }}
+      labels:
+        app: console-client
+        environment: development
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: wconsole-client
+          image: {{ .Values.frontend.console.image }}
+          imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
+          env:
+            - name: NODE_ENV
+              value: development
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: wconsole-client-nginx
+              mountPath: /etc/nginx/conf.d/wconsole-client.conf
+              subPath: wconsole-client.conf
+              readOnly: true
+            - name: log-volume
+              mountPath: /logs
+            - name: wconsole-client-spa-conf
+              mountPath: /var/www/config/production.json
+              subPath: production.json
+      volumes:
+        - name: wconsole-client-nginx
+          configMap:
+            name: wconsole-client-nginx
+        - name: log-volume
+          emptyDir: {}
+        - name: wconsole-client-spa-conf
+          configMap:
+            name: wconsole-client-spa-conf
+{{ end }}
+{{ end }}

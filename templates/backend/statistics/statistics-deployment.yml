@@ -1,0 +1,70 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.statistics.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: statistics
+  name: statistics
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: statistics
+  template:
+    metadata:
+      annotations:
+        spaceone.statistics.date: temp-spaceone-data-annotation
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/backend/statistics/statistics-conf.yml") . | sha256sum }}
+      labels:
+        app: statistics
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: statistics
+          image: {{ .Values.backend.services.statistics.image }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - name: statistics-conf
+              mountPath: /opt/spaceone/statistics/config/statistics.yml
+              subPath: statistics.yml
+              readOnly: true
+            - name: log-volume
+              mountPath: /logs
+          livenessProbe:
+            exec:
+              command:
+                - /bin/grpc_health_probe
+                - -addr=127.0.0.1:50051
+                - -service=statistics
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/grpc_health_probe
+#                - -addr=127.0.0.1:50051
+#                - -service=statistics
+#            initialDelaySeconds: 5
+#            failureThreshold: 3
+#            periodSeconds: 5
+#            successThreshold: 2
+#            timeoutSeconds: 1
+          env:
+            - name: SPACEONE_CONFIG_FILE
+              value: /opt/spaceone/statistics/config/statistics.yml
+      volumes:
+        - name: statistics-conf
+          configMap:
+            name: statistics-conf
+        - name: log-volume
+          emptyDir: {}
+{{ end }}
+{{ end }}

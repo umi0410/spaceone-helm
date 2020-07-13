@@ -1,0 +1,21 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.monitoring.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: monitoring
+  name: monitoring
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - nodePort: 30061
+      port: 50051
+      protocol: TCP
+  selector:
+    app: monitoring
+  sessionAffinity: None
+  type: NodePort
+{{ end }}
+{{ end }}

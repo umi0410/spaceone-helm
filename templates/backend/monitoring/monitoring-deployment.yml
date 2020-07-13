@@ -1,0 +1,70 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.monitoring.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: monitoring
+  name: monitoring
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: monitoring
+  template:
+    metadata:
+      annotations:
+        spaceone.monitoring.date: temp-spaceone-data-annotation
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/backend/monitoring/monitoring-conf.yml") . | sha256sum }}
+      labels:
+        app: monitoring
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: monitoring
+          image: {{ .Values.backend.services.monitoring.image }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - name: monitoring-conf
+              mountPath: /opt/spaceone/monitoring/config/monitoring.yml
+              subPath: monitoring.yml
+              readOnly: true
+            - name: log-volume
+              mountPath: /logs
+          livenessProbe:
+            exec:
+              command:
+                - /bin/grpc_health_probe
+                - -addr=127.0.0.1:50051
+                - -service=monitoring
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/grpc_health_probe
+#                - -addr=127.0.0.1:50051
+#                - -service=monitoring
+#            initialDelaySeconds: 5
+#            failureThreshold: 3
+#            periodSeconds: 5
+#            successThreshold: 2
+#            timeoutSeconds: 1
+          env:
+            - name: SPACEONE_CONFIG_FILE
+              value: /opt/spaceone/monitoring/config/monitoring.yml
+      volumes:
+        - name: monitoring-conf
+          configMap:
+            name: monitoring-conf
+        - name: log-volume
+          emptyDir: {}
+{{ end }}
+{{ end }}

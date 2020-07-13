@@ -1,0 +1,65 @@
+{{ if .Values.supervisor.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: supervisor-conf
+  namespace: '{{ .Values.namespace }}'
+data:
+  supervisor.yml: |
+    GLOBAL:
+      MAX_WORKERS: 500
+      PORT: 50051
+      NAME: root
+      HOSTNAME: {{ .Values.namespace }}.svc.cluster.local
+      BACKEND: KubernetesConnector
+      PLUGIN:
+        backend: KubernetesConnector
+        namespace: {{ .Values.namespace }}
+        start_port: 50051
+        end_port: 50052
+        headless: true
+        replica:
+          inventory.collector: 1
+
+      LOG:
+        loggers:
+          spaceone:
+            handlers:
+              - console
+              - file
+        handlers:
+          file:
+            type: file
+            filename: /logs/supervisor.log
+
+      CONNECTORS:
+        RepositoryConnector:
+          endpoint:
+            v1: grpc://{{ .Values.backend.services.repository.endpoint }}
+        PluginConnector:
+          endpoint:
+            v1: grpc://{{ .Values.backend.services.plugin.endpoint }}
+      QUEUES:
+        default_q:
+          backend: spaceone.core.queue.redis_queue.RedisQueue
+          host: {{ .Values.redis.host }}
+          port: {{ .Values.redis.port }}
+          channel: supervisor_queue
+
+      SCHEDULERS:
+        publish:
+          backend: spaceone.supervisor.scheduler.publish_scheduler.PublishScheduler
+          queue: default_q
+          interval: 30
+        sync:
+          backend: spaceone.supervisor.scheduler.sync_scheduler.SyncScheduler
+          queue: default_q
+          interval: 120
+
+      WORKERS:
+        worker:
+          backend: spaceone.core.scheduler.worker.BaseWorker
+          queue: default_q
+      TOKEN_INFO:
+{{ tpl (toYaml .Values.supervisor.supervisor.token) . | indent 8 }}
+{{ end }}

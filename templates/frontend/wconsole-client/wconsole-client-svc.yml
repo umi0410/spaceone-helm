@@ -1,0 +1,23 @@
+{{ if .Values.frontend.enabled }}
+{{ if .Values.frontend.console.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: console-client
+  name: console-client
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 32374
+  selector:
+    app: console-client
+    environment: development
+  sessionAffinity: None
+  type: NodePort
+{{ end }}
+{{ end }}

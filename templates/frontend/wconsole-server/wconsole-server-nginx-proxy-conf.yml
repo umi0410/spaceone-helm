@@ -1,0 +1,22 @@
+{{ if .Values.frontend.enabled }}
+{{ if .Values.frontend.consoleApi.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-wconsole-server
+  namespace: {{ .Values.namespace }}
+data:
+  wconsole-server-nginx.conf: |
+    server {
+      listen 80;
+      # server_name console-api.dev.spaceone.dev;
+
+      access_log /logs/wconsole-server-access.log main;
+      error_log  /logs/wconsole-server-error.log warn;
+
+      location / {
+        proxy_pass http://localhost:3000/;
+      }
+    }
+{{ end }}
+{{ end }}

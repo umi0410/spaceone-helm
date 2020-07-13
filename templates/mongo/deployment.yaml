@@ -1,0 +1,46 @@
+{{ if .Values.mongo.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongo
+  name: mongo
+  namespace: {{ .Values.namesapce }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  revisionHistoryLimit: {{ .Values.backend.revisionHistoryLimit | int }}
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      annotations:
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/mongo/conf.yml") . | sha256sum }}
+#        spaceone.identity.date: temp-spaceone-data-annotation
+      labels:
+        app: mongo
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: mongo
+          image: {{ .Values.mongo.image }}
+          imagePullPolicy: {{ .Values.mongo.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.mongo.port }}
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: {{ .Values.mongo.username }}
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: {{ .Values.mongo.password }}
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongo-data
+      volumes:
+        - name: mongo-data
+          emptyDir: {}
+        - name: mongo-conf
+          configMap:
+            name: mongo-conf
+
+
+{{ end }}

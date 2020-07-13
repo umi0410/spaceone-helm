@@ -1,0 +1,25 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.config.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-conf
+  namespace: {{ .Values.namespace }}
+data:
+  config.yml: |
+    GLOBAL:
+      DATABASES:
+        default:
+          db: 'dev-config'
+          host: {{ .Values.mongo.host }}
+          port: {{ .Values.mongo.port }}
+      HANDLERS:
+        authentication:
+        - backend: spaceone.core.handler.authentication_handler.AuthenticationGRPCHandler
+          uri: grpc://{{ .Values.backend.services.identity.endpoint }}/v1/Domain/get_public_key
+        authorization:
+        - backend: spaceone.core.handler.authorization_handler.AuthorizationGRPCHandler
+          uri: grpc://{{ .Values.backend.services.identity.endpoint }}/v1/Authorization/verify
+
+{{ end }}
+{{ end }}

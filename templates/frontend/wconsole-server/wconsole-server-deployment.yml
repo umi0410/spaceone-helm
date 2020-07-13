@@ -1,0 +1,65 @@
+{{ if .Values.frontend.enabled }}
+{{ if .Values.frontend.consoleApi.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: console-server
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: console-server
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: console-server
+  template:
+    metadata:
+      annotations:
+        spaceone.consoleserver.date: temp-spaceone-data-annotation
+        spaceone.auto-deploy-flag: {{ include (print $.Template.BasePath "/frontend/wconsole-server/wconsole-server-nginx-conf.yml") . | sha256sum }}
+      labels:
+        app: console-server
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+        - name: nginx-proxy
+          image: nginx:stable
+          imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-wconsole-server
+              mountPath: /etc/nginx/conf.d
+              readOnly: yes
+            - name: log-volume
+              mountPath: /logs
+            - name: nginx-wconsole-server-nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+        - name: wconsole-server
+          image: {{ .Values.frontend.consoleApi.image }}
+          imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: wconsole-server-conf
+              mountPath: /opt/spaceone/wconsole-server/config/production.json
+              subPath: production.json
+              readOnly: yes
+            - name: log-volume
+              mountPath: /logs
+      volumes:
+        - name: wconsole-server-conf
+          configMap:
+            name: wconsole-server-conf
+        - name: nginx-wconsole-server
+          configMap:
+            name: nginx-wconsole-server
+        - name: nginx-wconsole-server-nginx
+          configMap:
+            name: nginx-wconsole-server-nginx
+        - name: log-volume
+          emptyDir: {}
+{{ end }}
+{{ end }}

@@ -1,0 +1,21 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.inventoryWorker.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: inventory-worker
+  name: inventory-worker
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - nodePort: 30059
+      port: 50051
+      protocol: TCP
+  selector:
+    app: inventory-worker
+  sessionAffinity: None
+  type: NodePort
+{{ end }}
+{{ end }}

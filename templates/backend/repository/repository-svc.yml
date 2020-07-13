@@ -1,0 +1,21 @@
+{{ if .Values.backend.enabled }}
+{{ if .Values.backend.services.repository.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: repository
+  name: repository
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - nodePort: 30053
+      port: 50051
+      protocol: TCP
+  selector:
+    app: repository
+  sessionAffinity: None
+  type: NodePort
+{{ end }}
+{{ end }}

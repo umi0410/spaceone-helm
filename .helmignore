@@ -1,0 +1,4 @@
+.idea
+*/.idea
+spaceone-*.tgz
+dev-values.yaml

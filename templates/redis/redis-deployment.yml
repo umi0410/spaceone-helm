@@ -1,0 +1,53 @@
+{{ if .Values.redis.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
+      containers:
+      - name: redis
+        image: {{ .Values.redis.image }}
+        imagePullPolicy: {{ .Values.mongo.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.redis.port }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-conf
+  namespace: {{ .Values.namespace }}
+data:
+  redis.conf: |
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: {{ .Values.namespace }}
+  labels:
+    run: redis
+spec:
+  type: NodePort
+  ports:
+  - port: {{ .Values.redis.port }}
+    targetPort: {{ .Values.redis.port }}
+    nodePort: 31357
+    protocol: TCP
+  selector:
+    app: redis
+{{ end }}
