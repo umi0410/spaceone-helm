@@ -37,7 +37,7 @@ jobs:
           cat set_env.sh
 
   helm:
-#    if: github.repository_owner == 'spaceone-dev'
+    if: github.repository_owner == 'spaceone-dev'
     needs: initialize
     runs-on: ubuntu-latest
     steps:
@@ -92,10 +92,10 @@ jobs:
 
       - name: Install node dependency for makeBadges
         run: |
-          cd makeBages
+          cd makeBadges
           npm install
 
-      - name: makeBages
+      - name: makeBadges
         run: |
           cd makeBadges
           node index.js
