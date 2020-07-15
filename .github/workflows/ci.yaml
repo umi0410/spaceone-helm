@@ -91,7 +91,6 @@ jobs:
           node index.js
 
       - name: Upload fixed index.yaml to S3
-        uses: jakejarvis/s3-sync-action@master
         run: |
           cd editIndexYaml
           aws s3 cp index.yaml s3://${{ env.S3_BUCKET_NAME }}/${{ env.S3_BUCKET_SUBPATH_CHART }}/index.yaml
