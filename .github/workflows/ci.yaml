@@ -85,6 +85,7 @@ jobs:
           helm repo add spaceone-s3 s3://${{ env.S3_BUCKET_NAME }}/${{ env.S3_BUCKET_SUBPATH_CHART }}
           helm s3 push ./spaceone-*.tgz spaceone-s3 --force
       - name: Fix index.yaml s3:// => https://
+        uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: ${{ env.S3_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
