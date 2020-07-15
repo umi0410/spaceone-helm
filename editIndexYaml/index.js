@@ -3,7 +3,7 @@ const fs = require("fs")
 // S3_BUCKET_NAME = "helm.stargate.spaceone.dev-bucket"
 // ALTERNATIVE_HOST = "helm.stargate.spaceone.dev"
 S3_BUCKET_NAME = process.env.S3_BUCKET_NAME
-ALTERNATIVE_ENDPOINT = process.env.ALTERNATIVE_ENDPOINT
+ALTERNATIVE_HOST = process.env.ALTERNATIVE_HOST
 let index = fs.readFileSync("index.yaml", "utf-8")
 console.log(index)
 
