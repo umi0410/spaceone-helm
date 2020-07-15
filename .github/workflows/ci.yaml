@@ -87,7 +87,7 @@ jobs:
       - name: Fix index.yaml s3:// => https://
         env:
           S3_BUCKET_NAME: ${{ env.S3_BUCKET_NAME }}
-          ALTERNATIVE_ENDPOINT: "helm.stargate.spaceone.dev"
+          ALTERNATIVE_HOST: "helm.stargate.spaceone.dev"
         run: |
           cd editIndexYaml
           aws s3 cp s3://${{ env.S3_BUCKET_NAME }}/${{ env.S3_BUCKET_SUBPATH_CHART }}/index.yaml index.yaml
