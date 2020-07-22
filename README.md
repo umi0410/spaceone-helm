@@ -2,9 +2,7 @@
 
 > a [SpaceONE](https://github.com/spaceone-dev) chart for Helm 3 to deploy [SpaceONE](https://github.com/spaceone-dev) on K8s Cluster. 
 
-Manage your infrastructure with SpaceONE.
-It doesn't matter what your infrastructure is based on.
-SpaceONE supports AWS, GCP, Azure, IDC, ...etc.
+Manage your infrastructure with SpaceONE. It doesn't matter what your infrastructure is based on. SpaceONE supports AWS, GCP, Azure, IDC, ...etc.
 
 ![preview](https://helm.stargate.spaceone.dev/media/preview.png)
 
@@ -14,11 +12,12 @@ SpaceONE supports AWS, GCP, Azure, IDC, ...etc.
 
 * `kubefwd` or any environments provided `port-forward`
 * a `Kubernetes` Cluster.(minikube, EKS, ...)
-* Configurations for AWS Credentials in `values.yaml`-`backend.services.secret.awsSecretManagerConnector`
+* Some configurations in `values.yaml`
+  * AWS Credentials for AWS SecretManager in `backend.services.secret.awsSecretManagerConnector`
 
 ### Commands
 
-> Some initializing codes will be appended soon.
+> ⚠️  `inventory-scheduler` and `statistics-scheduler` doesn't work fine until you execute `initialize-spaceone` which is a Kubernetes `Job`. Please create the `Job` after reading the following commands. Those pods like `inventory-scheduler` or `statistics-scheduler` has some labels like `helm.stargate.spaceone.dev/need_initialization!=true`
 
 You should input your aws credentials which have permissions for AWS Secret Mananger in `values.yaml`
 
@@ -26,15 +25,16 @@ You should input your aws credentials which have permissions for AWS Secret Mana
 $ helm repo add spaceone https://helm.stargate.spaceone.dev
 $ helm repo update
 $ helm install sp spaceone/spaceone -f values.yaml
+$ kubectl get pod -n sp -l "helm.stargate.spaceone.dev/need_initialization!=true"
 
 $ sudo kubefwd svc -n default # this command can be replaced with any codes to execute the same job.
 ```
 
-👽 After deploying SpaceONE chart, you should create a Kubernetes `Job` to initialize data. You can see the manifest for the `Job` by the following commands.
+👽 After every pod except for `inventory-scheduler` and `statistics-scheduler` gets ready, you should create a Kubernetes `Job` named `initialize-spaceone` to initialize data. You can see the manifest for the `Job` by the following commands.
 ```
 helm get notes sp
 # OR replace sp with your release name.
-``` 
+```
 
 You can see the console page via http://console-client
 
@@ -97,6 +97,11 @@ This will be appended soon.
 
 ## Release History
 
+- 0.1.3
+  - you can set frontend hosts and endpoints.
+  - serve local repository.
+  - helm refactoring - applied unified indents
+  - service annotations and types are available - ClusterIP, NodePort and LoadBalancer.
 - 0.1.0
   - Initial version.
 

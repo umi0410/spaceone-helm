@@ -12,11 +12,16 @@ mongo:
   enabled: true
   initialize: true
   image: mongo
+  replicas: 1
   imagePullPolicy: IfNotPresent
   username: mongouser
   password: mongopassword
   host: mongo
   port: 27017
+  service:
+    type: ClusterIP
+    annotations:
+      nil: nil
 
 redis:
   enabled: true
@@ -24,12 +29,22 @@ redis:
   imagePullPolicy: IfNotPresent
   host: redis
   port: 6379
+  service:
+    type: ClusterIP
+    annotations:
+      nil: nil
+    
 
 consul:
   enabled: true
   image: consul:1.7.3
   imagePullPolicy: IfNotPresent
   host: consul
+  service:
+    type: ClusterIP
+    annotations:
+      nil: nil
+    
 
 backend:
   enabled: true
@@ -43,81 +58,145 @@ backend:
       enabled: true
       image: spaceone/config:latest
       endpoint: config:50051
-
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
     identity:
       enabled: true
       image: spaceone/identity:latest
       endpoint: identity:50051
-#      endpoint: 192.168.0.13:50053
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
+
     inventory:
       enabled: true
       image: spaceone/inventory:latest
       endpoint: inventory:50051
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
     inventoryWorker:
       enabled: true
       image: spaceone/inventory:latest
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
     inventoryScheduler:
       enabled: true
       image: spaceone/inventory:latest
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
     monitoring:
       enabled: true
       image: spaceone/monitoring:latest
       endpoint: monitoring:50051
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
     plugin:
       enabled: true
       image: spaceone/plugin:latest
       endpoint: plugin:50051
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
     repository:
       enabled: true
       image: spaceone/repository:latest
       endpoint: repository:50051
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
     secret:
       enabled: true
       image: spaceone/secret:latest
       endpoint: secret:50051
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
+
       awsSecretManagerConnector:
         awsAccessKeyId:
         awsSecretAccessKey:
         regionName: ap-northeast-2
 
-
     statistics:
       enabled: true
       image: spaceone/statistics:latest
       endpoint: statistics:50051
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
     statisticsScheduler:
       enabled: true
       image: spaceone/statistics:latest
+      service:
+        type: ClusterIP
+        annotations:
+          nil: nil
 
 
 frontend:
 #  domain: root # 안먹힘
-  replicas: 1
   enabled: true
+  replicas: 1
   imagePullPolicy: IfNotPresent
   console:
     enabled: true
     endpoint: console-client
-    image: spaceone/console
-  consoleApi:
-    endpoint: console-server
+    image: spaceone/console:latest
+    host: console
+    service:
+      type: NodePort
+      annotations:
+        nil: nil
+
+  # this service let you access to console through http://root by kubefwd
+  root:
     enabled: true
-    image: spaceone/console-api
+    endpoint: root
+    host: root
+    service:
+      type: NodePort
+      annotations:
+        nil: nil
+
+  consoleApi:
+    enabled: true
+    endpoint: console-api
+    image: spaceone/console-api:latest
+    service:
+      type: ClusterIP
+      annotations:
+        nil: nil
+
 
 supervisor:
   enabled: true
   imagePullPolicy: IfNotPresent
   supervisor:
     endpoint: supervisor
-    image: pyengine/supervisor
+    image: spaceone/supervisor:latest
     replicas: 1
     imagePullPolicy: IfNotPresent
     token: # yaml for TOKEN or TOKEN_INFO
@@ -125,16 +204,23 @@ supervisor:
       config:
         host: "{{ .Values.consul.host }}"
       uri: debug/supervisor/TOKEN
+    plugin:
+      imageRepository: pyengine
+    service:
+      type: ClusterIP
+      annotations:
+        nil: nil
+      
   kubectlProxy:
     image: spaceone/kubectl-proxy
 
 #######
 # Vault reference : https://www.vaultproject.io/docs/platform/k8s/helm/configuration
 #######
-vault:
-  global:
-    enabled: true
-  server:
-    dev:
-      enabled: true
-  name: hello
+#vault:
+#  global:
+#    enabled: true
+#  server:
+#    dev:
+#      enabled: true
+#  name: hello
