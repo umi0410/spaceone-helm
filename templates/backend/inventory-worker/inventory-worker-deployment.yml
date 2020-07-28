@@ -28,7 +28,7 @@ spec:
         - name: inventory-worker
           image: {{ .Values.backend.services.inventoryWorker.image }}
           imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
-          command: ['spaceone', 'scheduler', 'inventory']
+          command: ['spaceone', 'scheduler', 'spaceone.inventory']
           ports:
             - containerPort: 50051
           volumeMounts:

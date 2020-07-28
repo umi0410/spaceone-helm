@@ -98,14 +98,15 @@ This will be appended soon.
 ## Release History
 
 - 0.1.4
-  - support extraSpec to `Service` (e.g. .spec.loadBalancerSourceRanges)
+  - Support extraSpec to `Service` (e.g. .spec.loadBalancerSourceRanges)
     - only available in `Frontend`
-  
+  - Update some pod commands
+    - e.g. `spaceone scheduler statistics`=>`spaceone scheduler spaceone.statistics`
 - 0.1.3
-  - you can set frontend hosts and endpoints.
-  - serve local repository.
-  - helm refactoring - applied unified indents
-  - service annotations and types are available - ClusterIP, NodePort and LoadBalancer.
+  - You can set frontend hosts and endpoints.
+  - Serve local repository.
+  - Helm refactoring - applied unified indents
+  - Service annotations and types are available - ClusterIP, NodePort and LoadBalancer.
 - 0.1.0
   - Initial version.
 
