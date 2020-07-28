@@ -22,12 +22,17 @@ spec:
     {{- end }}
     {{- with .Values.frontend.consoleApi }}
   ports:
-    - port: 80
+    - name: http
+      port: 80
       protocol: TCP
       targetPort: 80
       {{- if and (or (eq .service.type "NodePort") (eq .service.type "LoadBalancer")) .service.nodePort }}
       nodePort: {{ .service.nodePort }}
       {{- end}}
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 80
   selector:
     helm.stargate.spaceone.dev/service: console-api
   sessionAffinity: None
