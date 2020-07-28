@@ -189,6 +189,7 @@ frontend:
   consoleApi:
     enabled: true
     endpoint: console-api
+    protocol: http # https
     image: spaceone/console-api:latest
     service:
       type: NodePort
