@@ -1,8 +1,9 @@
 name: SpaceONE CI
 on:
   push:
-    branches:
-      - master
+    tags:
+      - "**"
+  workflow_dispatch:
 
 jobs:
   initialize:
