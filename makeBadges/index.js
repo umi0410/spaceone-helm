@@ -1,6 +1,5 @@
 const { makeBadge, ValidationError } = require('badge-maker')
 const yaml = require('yaml')
-const svg2png = require('svg2png')
 const fs = require('fs')
 
 const yamlData = fs.readFileSync('../Chart.yaml', 'utf-8')
