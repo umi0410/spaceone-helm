@@ -1,0 +1,25 @@
+{{ if .Values.frontend.enabled }}
+{{ if .Values.frontend.console.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: console-spa-conf
+  namespace: {{ .Release.Namespace }}
+data:
+  production.json: |
+    {
+      "VUE_APP_API": {
+  {{- if eq .Values.frontend.consoleApi.protocol "http" }}
+        "ENDPOINT": "http://{{ .Values.frontend.consoleApi.endpoint }}"
+  {{- end }}
+  {{- if eq .Values.frontend.consoleApi.protocol "https" }}
+        "ENDPOINT": "https://{{ .Values.frontend.consoleApi.endpoint }}"
+  {{- end }}
+      },
+      "GTAG_ID": "DISABLED",
+      "DOMAIN_NAME_REF": "{{ .Values.frontend.console.domainName.ref }}",
+      "DOMAIN_NAME": "{{ .Values.frontend.console.domainName.name }}",
+      "NO_SERVER_MODE": false
+    }
+{{ end }}
+{{ end }}
