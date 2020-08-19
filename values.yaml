@@ -93,7 +93,7 @@ backend:
 
     identity:
       enabled: true
-      image: spaceone/identity:1.2.1
+      image: spaceone/identity:v1.2.1
       endpoint: identity:50051
       service:
         type: ClusterIP
@@ -148,7 +148,7 @@ backend:
 
     monitoring:
       enabled: true
-      image: spaceone/monitoring:1.2.1
+      image: spaceone/monitoring:v1.2.1
       endpoint: monitoring:50051
       service:
         type: ClusterIP
@@ -162,7 +162,7 @@ backend:
 
     plugin:
       enabled: true
-      image: spaceone/plugin:1.2.1
+      image: spaceone/plugin:v1.2.1
       endpoint: plugin:50051
       service:
         type: ClusterIP
@@ -176,7 +176,7 @@ backend:
 
     repository:
       enabled: true
-      image: spaceone/repository:1.2.1
+      image: spaceone/repository:v1.2.1
       endpoint: repository:50051
       service:
         type: ClusterIP
@@ -190,7 +190,7 @@ backend:
 
     secret:
       enabled: true
-      image: spaceone/secret:1.2.1
+      image: spaceone/secret:v1.2.1
       endpoint: secret:50051
       service:
         type: ClusterIP
@@ -209,7 +209,7 @@ backend:
 
     statistics:
       enabled: true
-      image: spaceone/statistics:1.2.1
+      image: spaceone/statistics:v1.2.1
       endpoint: statistics:50051
       service:
         type: ClusterIP
@@ -312,7 +312,7 @@ supervisor:
   enabled: true
   imagePullPolicy: IfNotPresent
   supervisor:
-    image: spaceone/supervisor:1.2.1
+    image: spaceone/supervisor:v1.2.1
     replicas: 1
     imagePullPolicy: IfNotPresent
     token: # yaml for TOKEN or TOKEN_INFO
