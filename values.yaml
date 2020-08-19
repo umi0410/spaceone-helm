@@ -79,7 +79,7 @@ backend:
   services:
     config:
       enabled: true
-      image: spaceone/config:1.2.1
+      image: spaceone/config:v1.2.1
       endpoint: config:50051
       service:
         type: ClusterIP
@@ -223,7 +223,7 @@ backend:
 
     statisticsScheduler:
       enabled: true
-      image: spaceone/statistics:1.2.1
+      image: spaceone/statistics:v1.2.1
       service:
         type: ClusterIP
         annotations:
