@@ -12,15 +12,6 @@ data:
       NAME: root
       HOSTNAME: {{ .Release.Namespace }}.svc.cluster.local
       BACKEND: KubernetesConnector
-      PLUGIN:
-        backend: KubernetesConnector
-        namespace: {{ .Release.Namespace }}
-        start_port: 50051
-        end_port: 50052
-        headless: true
-        replica:
-          inventory.collector: {{ tpl .Values.supervisor.supervisor.plugin.replicas . }}
-
       LOG:
         loggers:
           spaceone:
@@ -39,6 +30,14 @@ data:
         PluginConnector:
           endpoint:
             v1: grpc://{{ .Values.backend.services.plugin.endpoint }}
+        KubernetesConnector:
+          namespace: {{ .Release.Namespace }}
+          start_port: 50051
+          end_port: 50052
+          headless: true
+          replica:
+            inventory.collector: {{ tpl .Values.supervisor.supervisor.plugin.replicas . }}
+            
       QUEUES:
         default_q:
           backend: spaceone.core.queue.redis_queue.RedisQueue
