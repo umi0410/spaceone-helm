@@ -312,7 +312,7 @@ supervisor:
   enabled: true
   imagePullPolicy: IfNotPresent
   supervisor:
-    image: spaceone/supervisor:v1.2.1
+    image: spaceone/supervisor:1.2.1-1
     replicas: 1
     imagePullPolicy: IfNotPresent
     token: # yaml for TOKEN or TOKEN_INFO

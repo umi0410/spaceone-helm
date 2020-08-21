@@ -248,7 +248,9 @@ $ helm install sp spaceone/spaceone -n default -f values.yaml
 This will be appended soon.
 
 ## Release History
-
+- 1.2.1
+  - reflect change of `supervisor-conf`
+  - specify the version of docker images from `latest`
 - 1.1.4
   - no need to set console hostname as `root`.
   - Trigger `initialize-spaceone` automatically
