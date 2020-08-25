@@ -4,3 +4,7 @@ spaceone-*.tgz
 dev-values.yaml
 makeBadges/
 editIndexYaml/
+.github
+.gitignore
+templates/.idea
+README.md

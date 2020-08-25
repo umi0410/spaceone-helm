@@ -8,7 +8,6 @@ data:
   supervisor.yml: |
     GLOBAL:
       MAX_WORKERS: 500
-      PORT: 50051
       NAME: root
       HOSTNAME: {{ .Release.Namespace }}.svc.cluster.local
       BACKEND: KubernetesConnector
