@@ -1,0 +1,77 @@
+# deploy always
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spacectl-apply-conf
+  namespace: {{ .Release.Namespace }}
+data:
+{{ range $path, $_ :=  .Files.Glob  "files/initialize-spaceone/spacectl/*.yaml" }}
+{{ $file_name := split "/" $path }}
+  {{ $file_name._3 }}: |
+{{ $.Files.Get $path | indent 4 }}
+{{ end }}
+
+
+  init_db.js: |
+    db = db.getSiblingDB('dev-identity')
+    db.createUser(
+        {
+            user: "{{ .Values.mongo.username }}",
+            pwd: "{{ .Values.mongo.password }}",
+            roles: [ {role: "readWrite", db: "dev-identity" } ]
+        }
+    );
+
+    db = db.getSiblingDB('dev-inventory')
+    db.createUser(
+        {
+            user: "{{ .Values.mongo.username }}",
+            pwd: "{{ .Values.mongo.password }}",
+            roles: [ {role: "readWrite", db: "dev-inventory" } ]
+        }
+    );
+
+    db = db.getSiblingDB('dev-repository')
+    db.createUser(
+        {
+            user: "{{ .Values.mongo.username }}",
+            pwd: "{{ .Values.mongo.password }}",
+            roles: [ {role: "readWrite", db: "dev-repository" } ]
+        }
+    );
+
+    db = db.getSiblingDB('dev-plugin')
+    db.createUser(
+        {
+            user: "{{ .Values.mongo.username }}",
+            pwd: "{{ .Values.mongo.password }}",
+            roles: [ {role: "readWrite", db: "dev-plugin" } ]
+        }
+    );
+
+    db = db.getSiblingDB('dev-secret')
+    db.createUser(
+        {
+            user: "{{ .Values.mongo.username }}",
+            pwd: "{{ .Values.mongo.password }}",
+            roles: [ {role: "readWrite", db: "dev-secret" } ]
+        }
+    );
+
+    db = db.getSiblingDB('dev-marketplace')
+    db.createUser(
+        {
+            user: "{{ .Values.mongo.username }}",
+            pwd: "{{ .Values.mongo.password }}",
+            roles: [ {role: "readWrite", db: "dev-marketplace" } ]
+        }
+    );
+
+    db = db.getSiblingDB('dev-statistics')
+    db.createUser(
+        {
+            user: "{{ .Values.mongo.username }}",
+            pwd: "{{ .Values.mongo.password }}",
+            roles: [ {role: "readWrite", db: "dev-statistics" } ]
+        }
+    );

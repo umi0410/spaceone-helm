@@ -29,36 +29,4 @@ spec:
   type: {{ .service.type }}
     {{- end }}
   {{- end }}
----
-  {{- if .Values.frontend.root.enabled }}
-# this service let you access to console through http://root by kubefwd
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    {{- range $key, $value := .Values.frontend.root.service.annotations }}
-      {{- if not (eq $key "nil") }}
-    {{ $key }}: {{ $value | quote }}
-      {{- end }}
-    {{- end }}
-  labels:
-{{ include "spaceone.labels" . | indent 4 }}
-    helm.stargate.spaceone.dev/service: console
-  name: root
-  namespace: {{ .Release.Namespace }}
-spec:
-    {{- range $key, $value := .Values.frontend.root.service.extraSpec }}
-      {{- if not (eq $key "nil") }}
-  {{ $key }}: {{ $value }}
-      {{- end }}
-    {{- end }}
-    {{- with .Values.frontend.root }}
-  ports:
-{{ toYaml .service.ports | indent 4 }}
-  selector:
-    helm.stargate.spaceone.dev/service: console
-  sessionAffinity: None
-  type: {{ .service.type }}
-    {{- end }}
-  {{- end }}
 {{- end }}
