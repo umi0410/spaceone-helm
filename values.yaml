@@ -1,12 +1,8 @@
 # Default values for spaceone.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-installedBy:
-  author: jinsu
 
-#namePrefix: "{{ .Realease.Name }}"
-
-gracePeriod: 3
+gracePeriod: 3 # for dev, long gracePeriod is useless
 
 initializer:
   image: umi0410/spacectl:1.2.2

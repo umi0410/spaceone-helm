@@ -6,6 +6,6 @@ tasks:
     uses: "@modules/shell"
     spec:
       run: |
-        mongo --host mongo:27017 \
-        --username mongouser \
-        --password mongopassword < ${{ var.mongo_init_path }}
+        mongo --host {{ .Values.mongo.host }}:{{ .Values.mongo.port }} \
+        --username {{ .Values.mongo.username }} \
+        --password {{ .Values.mongo.password }} < ${{ var.mongo_init_path }}

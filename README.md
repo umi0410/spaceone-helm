@@ -252,6 +252,8 @@ This will be appended soon.
 * 1.2.2
   * Replace initialize codes using `spaceone-tester` with codes using `spacectl`
   * Remove `templates/tester-conf.yml`
+  * Change name `initializer` to `initialize-spaceone`
+  * Specify image tags as `1.2.2`.
 
 - 1.2.1
   - reflect change of `supervisor-conf`
