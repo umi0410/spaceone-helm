@@ -7,7 +7,7 @@ import:
 
 
 var:
-  domain_name: {{ .Values.initialize-spaceone }}
+  domain_name: root
   domain_owner: admin
   username: admin
   mongo_init_path: init_db.js

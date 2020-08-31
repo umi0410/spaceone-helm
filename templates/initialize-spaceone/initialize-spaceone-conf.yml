@@ -6,8 +6,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   initialize.sh: |
-
-
     echo START SPACEONE INITIALIZE
 
     echo INSTALL Mongo Shell

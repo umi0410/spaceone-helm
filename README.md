@@ -252,8 +252,11 @@ This will be appended soon.
 * 1.2.2
   * Replace initialize codes using `spaceone-tester` with codes using `spacectl`
   * Remove `templates/tester-conf.yml`
-  * Change name `initializer` to `initialize-spaceone`
+  * Update initializer
+    * Change the name(`initializer` into `initialize-spaceone`).
+    * Change the image repository of `job-0-msa-health-check` before initialize-spaceone(`umi0410/grpcurl`->`networld/grpcurl`)
   * Specify image tags as `1.2.2`.
+  * 
 
 - 1.2.1
   - reflect change of `supervisor-conf`
