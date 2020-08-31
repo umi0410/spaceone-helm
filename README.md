@@ -248,6 +248,11 @@ $ helm install sp spaceone/spaceone -n default -f values.yaml
 This will be appended soon.
 
 ## Release History
+
+* 1.2.2
+  * Replace initialize codes using `spaceone-tester` with codes using `spacectl`
+  * Remove `templates/tester-conf.yml`
+
 - 1.2.1
   - reflect change of `supervisor-conf`
   - specify the version of docker images from `latest`

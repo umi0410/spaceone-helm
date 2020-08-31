@@ -6,116 +6,22 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   initialize.sh: |
+
+
     echo START SPACEONE INITIALIZE
-    cd /root/scripts/
-    mkdir init
-    mkdir plugin
-    mkdir schema
 
-    # configmap directory is read only file system
-    # so we copy this to each directory
+    echo INSTALL Mongo Shell
+    # https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/
+    wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
+    apt-get install gnupg
+    wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
+    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+    apt-get update
+    apt-get install -y mongodb-org-shell
 
-    cp configmap/tester/config.yml init/config.yml
-    cp configmap/tester/init-scenario.json init/scenario.json
-    cp configmap/tester/test_DomainOwner.py init/test_DomainOwner.py
+    cd /root/spacectl/apply
+    spacectl apply main.yaml
 
-    cp configmap/tester/config.yml plugin/config.yml
-    cp configmap/tester/plugin-scenario.json plugin/scenario.json
-    cp configmap/tester/test_add_new_plugin.py plugin/test_add_new_plugin.py
-
-    cp configmap/tester/config.yml schema/config.yml
-    cp configmap/tester/schema-scenario.json schema/scenario.json
-    cp configmap/tester/test_add_new_schema.py schema/test_add_new_schema.py
-
-    pip install --upgrade spaceone-core spaceone-api spaceone-tester spacectl
-
-    cd init
-    spaceone test
-    cd ..
-
-    cd plugin
-    spaceone test
-    cd ..
-
-    cd schema
-    spaceone test
-    cd ..
-
-    cd /root
-    TOKEN=$(curl http://consul/v1/kv/debug/supervisor/TOKEN?raw=true)
-    echo api_key: $(curl curl http://consul/v1/kv/debug/supervisor/TOKEN?raw=true)>>/root/.spaceone/environments/helm-root.yml
-
-    # spacectl list domain -q -c domain_id
-    # This will be added after spacectl upgraded.s
-    # DOMAIN_ID=$(spacectl list domain -c domain_id -q -p name=root)
-    # REPOSITORY_ID=$(spacectl list repository  -c repository_id -q -p 'domain_id=$DOMAIN_ID')
-    # PLUGIN_ID=$(spacectl list plugin -c plugin_id -q -p 'repository_id=$REPOSITORY_ID' -p name=aws-ec2 -c plugin_id | grep plugin-)
-    # get version
-    # get endpoint
     echo FINISH SPACEONE INITIALIZE
-
-  init-db.js: |
-    db = db.getSiblingDB('dev-identity')
-    db.createUser(
-        {
-            user: "{{ .Values.mongo.username }}",
-            pwd: "{{ .Values.mongo.password }}",
-            roles: [ {role: "readWrite", db: "dev-identity" } ]
-        }
-    );
-
-    db = db.getSiblingDB('dev-inventory')
-    db.createUser(
-        {
-            user: "{{ .Values.mongo.username }}",
-            pwd: "{{ .Values.mongo.password }}",
-            roles: [ {role: "readWrite", db: "dev-inventory" } ]
-        }
-    );
-
-    db = db.getSiblingDB('dev-repository')
-    db.createUser(
-        {
-            user: "{{ .Values.mongo.username }}",
-            pwd: "{{ .Values.mongo.password }}",
-            roles: [ {role: "readWrite", db: "dev-repository" } ]
-        }
-    );
-
-    db = db.getSiblingDB('dev-plugin')
-    db.createUser(
-        {
-            user: "{{ .Values.mongo.username }}",
-            pwd: "{{ .Values.mongo.password }}",
-            roles: [ {role: "readWrite", db: "dev-plugin" } ]
-        }
-    );
-
-    db = db.getSiblingDB('dev-secret')
-    db.createUser(
-        {
-            user: "{{ .Values.mongo.username }}",
-            pwd: "{{ .Values.mongo.password }}",
-            roles: [ {role: "readWrite", db: "dev-secret" } ]
-        }
-    );
-
-    db = db.getSiblingDB('dev-marketplace')
-    db.createUser(
-        {
-            user: "{{ .Values.mongo.username }}",
-            pwd: "{{ .Values.mongo.password }}",
-            roles: [ {role: "readWrite", db: "dev-marketplace" } ]
-        }
-    );
-
-    db = db.getSiblingDB('dev-statistics')
-    db.createUser(
-        {
-            user: "{{ .Values.mongo.username }}",
-            pwd: "{{ .Values.mongo.password }}",
-            roles: [ {role: "readWrite", db: "dev-statistics" } ]
-        }
-    );
   initialize-spaceone.yml: |
 {{ tpl (.Files.Get "files/initialize-spaceone.yml") . | indent 4 }}

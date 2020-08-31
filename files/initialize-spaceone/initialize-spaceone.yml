@@ -64,34 +64,52 @@ spec:
 
                 sleep 1;
               done
-        - name: job-1-set-mongo-db
-          image: {{ .Values.mongo.image}}
+        - name: job-1-spacectl-conf-writable
+          imagePullPolicy: IfNotPresent
+          image: busybox
           command:
             - sh
             - -c
-            - mongo --host {{ .Values.mongo.host }}:{{ .Values.mongo.port }} --username {{ .Values.mongo.username }} --password {{ .Values.mongo.password }} < /root/scripts/init-db.js
+            - cp -r /root/initializer/spaceconfig/* /root/.spaceone
           volumeMounts:
-            - mountPath: /root/scripts/init-db.js
-              name: initialize-spaceone-conf
-              subPath: init-db.js
+            - mountPath: /root/.spaceone
+              name: writable-spacectl-conf
+
+            - mountPath: /root/initializer/spaceconfig/environment.yml
+              name: spacectl-conf
+              subPath: environment.yml
+            - mountPath: /root/initializer/spaceconfig/environments/helm-root.yml
+              name: spacectl-conf
+              subPath: helm-root.yml
+
       containers:
       - name: job-2-initialize-spaceone
-        image: {{ .Values.initializer.image }}
-        imagePullPolicy: {{ .Values.initializer.imagePullPolicy}}
+#        image: {{ .Values.initializer.image }}
+        image: umi0410/spacectl:1.2.2
+        imagePullPolicy: Always
+#        imagePullPolicy: {{ .Values.initializer.imagePullPolicy}}
         command:
           - sh
-          - /root/scripts/configmap/initialize-spaceone/initialize.sh
+          - /root/initialize.sh
         volumeMounts:
-          - mountPath: /root/scripts/configmap/tester
-            name: tester-conf
-          - mountPath: /root/scripts/configmap/initialize-spaceone/initialize.sh
+          - mountPath: /root/initialize.sh
             name: initialize-spaceone-conf
             subPath: initialize.sh
 
+          - mountPath: /root/.spaceone
+            name: writable-spacectl-conf
+          - mountPath: /root/spacectl/apply
+            name: spacectl-apply-conf
+
       volumes:
-        - name: tester-conf
-          configMap:
-            name: tester-conf
         - name: initialize-spaceone-conf
           configMap:
             name: initialize-spaceone-conf
+        - name: spacectl-conf
+          configMap:
+            name: spacectl-conf
+        - name: writable-spacectl-conf
+          emptyDir: {}
+        - name: spacectl-apply-conf
+          configMap:
+            name: spacectl-apply-conf

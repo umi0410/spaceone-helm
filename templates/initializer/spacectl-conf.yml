@@ -9,11 +9,11 @@ data:
     environment: helm-root
   helm-root.yml: |
     endpoints:
-      config: grpc://config:50051
-      identity: grpc://identity:50051
-      repository: grpc://repository:50051
-      plugin: grpc://plugin:50051
-      secret: grpc://secret:50051
-      inventory: grpc://inventory:50051
-      monitoring: grpc://monitoring:50051
-      statistics: grpc://statistics:50051
+      config: grpc://{{ .Values.backend.services.config.endpoint }}
+      identity: grpc://{{ .Values.backend.services.identity.endpoint }}
+      inventory: grpc://{{ .Values.backend.services.inventory.endpoint }}
+      monitoring: grpc://{{ .Values.backend.services.monitoring.endpoint }}
+      plugin: grpc://{{ .Values.backend.services.plugin.endpoint }}
+      repository: grpc://{{ .Values.backend.services.repository.endpoint }}
+      secret: grpc://{{ .Values.backend.services.secret.endpoint }}
+      statistics: grpc://{{ .Values.backend.services.statistics.endpoint }}

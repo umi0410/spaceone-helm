@@ -9,8 +9,8 @@ installedBy:
 gracePeriod: 3
 
 initializer:
-  image: spaceone/tester:latest
-  imagePullPolicy: IfNotPresent
+  image: umi0410/spacectl:1.2.2
+  imagePullPolicy: Always
 
 mongo:
   enabled: true
@@ -79,7 +79,7 @@ backend:
   services:
     config:
       enabled: true
-      image: spaceone/config:v1.2.1
+      image: spaceone/config:1.2.2
       endpoint: config:50051
       service:
         type: ClusterIP
@@ -93,7 +93,7 @@ backend:
 
     identity:
       enabled: true
-      image: spaceone/identity:v1.2.1
+      image: spaceone/identity:1.2.2
       endpoint: identity:50051
       service:
         type: ClusterIP
@@ -107,7 +107,7 @@ backend:
 
     inventory:
       enabled: true
-      image: spaceone/inventory:1.2.1
+      image: spaceone/inventory:1.2.2
       endpoint: inventory:50051
       service:
         type: ClusterIP
@@ -121,7 +121,7 @@ backend:
 
     inventoryWorker:
       enabled: true
-      image: spaceone/inventory:1.2.1
+      image: spaceone/inventory:1.2.2
       replicas: 2
       service:
         type: ClusterIP
@@ -135,7 +135,7 @@ backend:
 
     inventoryScheduler:
       enabled: true
-      image: spaceone/inventory:1.2.1
+      image: spaceone/inventory:1.2.2
       service:
         type: ClusterIP
         annotations:
@@ -148,7 +148,7 @@ backend:
 
     monitoring:
       enabled: true
-      image: spaceone/monitoring:v1.2.1
+      image: spaceone/monitoring:1.2.2
       endpoint: monitoring:50051
       service:
         type: ClusterIP
@@ -162,7 +162,7 @@ backend:
 
     plugin:
       enabled: true
-      image: spaceone/plugin:v1.2.1
+      image: spaceone/plugin:1.2.2
       endpoint: plugin:50051
       service:
         type: ClusterIP
@@ -176,7 +176,7 @@ backend:
 
     repository:
       enabled: true
-      image: spaceone/repository:v1.2.1
+      image: spaceone/repository:1.2.2
       endpoint: repository:50051
       service:
         type: ClusterIP
@@ -190,7 +190,7 @@ backend:
 
     secret:
       enabled: true
-      image: spaceone/secret:v1.2.1
+      image: spaceone/secret:1.2.2
       endpoint: secret:50051
       service:
         type: ClusterIP
@@ -209,7 +209,7 @@ backend:
 
     statistics:
       enabled: true
-      image: spaceone/statistics:v1.2.1
+      image: spaceone/statistics:1.2.2
       endpoint: statistics:50051
       service:
         type: ClusterIP
@@ -223,7 +223,7 @@ backend:
 
     statisticsScheduler:
       enabled: true
-      image: spaceone/statistics:v1.2.1
+      image: spaceone/statistics:1.2.2
       service:
         type: ClusterIP
         annotations:
@@ -244,7 +244,7 @@ frontend:
   console:
     enabled: true
     image: spaceone/console
-    tag: 1.1.4
+    tag: 1.2.1
     host: console
     service:
       type: ClusterIP
@@ -266,31 +266,11 @@ frontend:
       ref: config # hostname
       name: root # megazone
 
-  # this service let you access to console through http://root by kubefwd
-  root:
-    enabled: true
-    host: root
-    service:
-      type: ClusterIP
-      annotations:
-        nil: nil
-      extraSpec:
-        nil: nil
-      ports:
-        - name: http
-          port: 80
-          targetPort: 80
-          protocol: TCP
-        - name: https
-          port: 443
-          targetPort: 80
-          protocol: TCP
-
   consoleApi:
     enabled: true
     endpoint: console-api
     protocol: http # https
-    image: spaceone/console-api:1.2.1
+    image: spaceone/console-api:1.2.2
     service:
       type: ClusterIP
       annotations:
@@ -312,7 +292,7 @@ supervisor:
   enabled: true
   imagePullPolicy: IfNotPresent
   supervisor:
-    image: spaceone/supervisor:1.2.1-1
+    image: spaceone/supervisor:1.2.2
     replicas: 1
     imagePullPolicy: IfNotPresent
     token: # yaml for TOKEN or TOKEN_INFO
